@@ -19,7 +19,7 @@ int mode = 0;
 int a = 1;
 //float f=1;
 float sr = 1;
-float ADCdata[200];
+float ADCdata[100];
 
 
 void downdisplay()
@@ -109,14 +109,14 @@ void sampling()
         while(1)
         {
             if(sw==1) break;
-            for(int i = 0; i < 200; i++)
+            for(int i = 0; i < 100; i++)
             {
                 ADCdata[i] = Ain;
                 wait_us(5000);
 
             }
             //printf("%f\r\n", f);                         
-            for(int i =0; i < 200; i++)
+            for(int i =0; i < 100; i++)
             {
                 printf("%f\r\n", ADCdata[i]);
                 wait_us(50000);
@@ -134,7 +134,7 @@ void waveform()
         for(float i = 0.0f; i < 1; i=i+0.001*a)
         {
             Aout = i;
-            wait_us(100);
+            wait_us(80);
         }
         for(float i = 0.0f; i < 1-0.2*sr; i=i+0.01)
         {        
@@ -144,7 +144,7 @@ void waveform()
        for(float i = 1; i > 0.0f; i=i-0.001*a)
         {
             Aout = i;
-            wait_us(100);
+            wait_us(800);
         }    
     }
 }
