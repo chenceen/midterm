@@ -4,18 +4,20 @@ using namespace std::chrono;
 
 uLCD_4DGL uLCD(D1, D0, D2);
 InterruptIn confirm(D5);
-//DigitalIn confirm(D5);
 AnalogIn Ain(A0);
+DigitalOut led(LED2);
 AnalogOut Aout(D7);
 InterruptIn upbtn(D3);
 InterruptIn downbtn(D4);
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
-Thread t(osPriorityHigh);
-Thread wave(osPriorityNormal);
-Thread sample(osPriorityNormal);
+Thread t;
+Thread wave;
+//Thread sample;
 
 int mode = 0;
+int a = 1;
 float f=1;
+float sr = 1;
 float ADCdata[500];
 
 
@@ -23,75 +25,80 @@ void downdisplay()
 {
     if(mode>0) mode--;
     else mode = 0;
-    //while(!confirm){
     switch(mode)
     {
         case 0:
-            //f = 1;
             uLCD.triangle(86, 35, 89, 32, 89, 38, WHITE);
             uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
             uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);
             break;
         case 1:
-            //f = 185;
             uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
             uLCD.triangle(86, 52, 89, 49, 89, 55, WHITE);
             uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);
             break;       
         case 2:
-            //f = 400;
             uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
             uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
             uLCD.triangle(86, 69, 89, 66, 89, 72, WHITE);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);
             break;      
+        case 3:
+            uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
+            uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
+            uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, WHITE);
+            break;    
         default:
             uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
             uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
-            uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);        
+            uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK); 
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);       
             uLCD.printf("error\n");
     }
-    //}
-    //if(mode==0) uLCD.triangle(86, 35, 89, 32, 89, 38, GREEN);
-    //else if(mode==1) uLCD.triangle(86, 52, 89, 49, 89, 55, GREEN);
-    //else if(mode==2) uLCD.triangle(86, 69, 89, 66, 89, 72, GREEN);
+
 }
 void updisplay()
 {
-    if(mode<2) mode++;
-    else mode = 2;
-    //while(!confirm){
+    if(mode<3) mode++;
+    else mode = 3;
     switch(mode)
     {
         case 0:
-            //f = 1;
             uLCD.triangle(86, 35, 89, 32, 89, 38, WHITE);
             uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
             uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);
             break;
         case 1:
-            //f = 185;
             uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
             uLCD.triangle(86, 52, 89, 49, 89, 55, WHITE);
             uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);
             break;       
         case 2:
-            //f = 400;
             uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
             uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
             uLCD.triangle(86, 69, 89, 66, 89, 72, WHITE);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);
             break;      
+        case 3:
+            uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
+            uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
+            uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);
+            uLCD.triangle(86, 86, 89, 83, 89, 89, WHITE);
+            break;    
         default:
             uLCD.triangle(86, 35, 89, 32, 89, 38, BLACK);
             uLCD.triangle(86, 52, 89, 49, 89, 55, BLACK);
-            uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK);        
+            uLCD.triangle(86, 69, 89, 66, 89, 72, BLACK); 
+            uLCD.triangle(86, 86, 89, 83, 89, 89, BLACK);       
             uLCD.printf("error\n");
     }
-    //}
-    //if(mode==0) uLCD.triangle(86, 35, 89, 32, 89, 38, GREEN);
-    //else if(mode==1) uLCD.triangle(86, 52, 89, 49, 89, 55, GREEN);
-    //else if(mode==2) uLCD.triangle(86, 69, 89, 66, 89, 72, GREEN);
 }
-void sampling()
+/*void sampling()
 {
     while(1)
     {
@@ -107,20 +114,27 @@ void sampling()
         }
     }
 }
-
+*/
 void waveform()
 {
-    while(1){
-    for(float i = 0.0f; i < 1; i=i+f/4000)
+    while(1)
     {
-        Aout = i;
-        wait_us(37);
-    }
-    for(float i = 0.0f; i < 4; i=i+f/4000)
-    {        
-        Aout = (4-i)/4.0f;
-        wait_us(37);
-    }      
+        led = !led;
+        for(float i = 0.0f; i < 1; i=i+0.0001*sr)
+        {
+            Aout = i;
+            wait_us(10);
+        }
+        for(float i = 0.0f; i < 10-a; i++)
+        {        
+            Aout = 1;
+            ThisThread::sleep_for(100ms);
+        }  
+       for(float i = 1; i > 0.0f; i=i-0.0001*sr)
+        {
+            Aout = i;
+            wait_us(10);
+        }    
     }
 }
 
@@ -129,20 +143,28 @@ void output()
     if(mode==0)
     {
         uLCD.triangle(86, 35, 89, 32, 89, 38, GREEN);
-        f = 1;
+        sr = 1/8;
+        a = 8;
     }
     else if(mode==1)
     {
         uLCD.triangle(86, 52, 89, 49, 89, 55, GREEN);
-        f = 185;
+        sr = 1/4;
+        a = 4;
     }
     else if(mode==2)
     {
         uLCD.triangle(86, 69, 89, 66, 89, 72, GREEN);
-        f = 800;
+        sr = 1/2;
+        a = 2;
     }
-    //for(int i =0; i < 250; i++)
-    //    ADCdata[i] = 0.0f;
+    else if(mode==3)
+    {
+        uLCD.triangle(86, 86, 89, 83, 89, 89, GREEN);
+        sr = 1;
+        a = 1;
+    }
+    
 
 }
 
@@ -162,8 +184,9 @@ int main()
     uLCD.printf("1/2\n");
     uLCD.locate(5, 10);
     uLCD.printf("  1\n");
+    led = 1;
     wave.start(waveform);
     ThisThread::sleep_for(1020ms);
-    sample.start(sampling);
+    //sample.start(sampling);
 
 }
