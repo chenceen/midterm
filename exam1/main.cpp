@@ -6,20 +6,20 @@ uLCD_4DGL uLCD(D1, D0, D2);
 InterruptIn confirm(D5);
 AnalogIn Ain(A0);
 DigitalIn sw(USER_BUTTON);
-DigitalOut led(LED2);
+//DigitalOut led(LED2);
 AnalogOut Aout(D7);
 InterruptIn upbtn(D3);
 InterruptIn downbtn(D4);
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
 Thread t;
 Thread wave;
-//Thread sample;
+Thread sample;
 
 int mode = 0;
 int a = 1;
 //float f=1;
 float sr = 1;
-float ADCdata[500];
+float ADCdata[200];
 
 
 void downdisplay()
@@ -100,7 +100,7 @@ void updisplay()
     }
 }
 
-/*
+
 void sampling()
 {
     //float ADCdata[600];                                  
@@ -109,14 +109,14 @@ void sampling()
         while(1)
         {
             if(sw==1) break;
-            for(int i = 0; i < 600; i++)
+            for(int i = 0; i < 200; i++)
             {
                 ADCdata[i] = Ain;
-                wait_us(1700);
+                wait_us(5000);
 
             }
             //printf("%f\r\n", f);                         
-            for(int i =0; i < 600; i++)
+            for(int i =0; i < 200; i++)
             {
                 printf("%f\r\n", ADCdata[i]);
                 wait_us(50000);
@@ -125,12 +125,12 @@ void sampling()
     }
 }
 
-*/
+
 void waveform()
 {
     while(1)
     {
-        led = !led;
+        //led = !led;
         for(float i = 0.0f; i < 1; i=i+0.001*a)
         {
             Aout = i;
@@ -195,9 +195,9 @@ int main()
     uLCD.printf("1/2\n");
     uLCD.locate(5, 10);
     uLCD.printf("  1\n");
-    led = 1;
+    //led = 1;
     wave.start(waveform);
     //ThisThread::sleep_for(1020ms);
-    //sample.start(sampling);
+    sample.start(sampling);
 
 }
