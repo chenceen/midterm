@@ -131,20 +131,20 @@ void waveform()
     while(1)
     {
         led = !led;
-        for(float i = 0.0f; i < 1; i=i+0.001*sr)
+        for(float i = 0.0f; i < 1; i=i+0.001*a)
         {
             Aout = i;
             wait_us(100);
         }
-        for(float i = 0.0f; i < 10-a; i++)
+        for(float i = 0.0f; i < 1-0.2*sr; i=i+0.01)
         {        
             Aout = 1;
-            ThisThread::sleep_for(100ms);
+            ThisThread::sleep_for(10ms);
         }  
-       for(float i = 1; i > 0.0f; i=i-0.001*sr)
+       for(float i = 1; i > 0.0f; i=i-0.001*a)
         {
             Aout = i;
-            wait_us(10);
+            wait_us(100);
         }    
     }
 }
