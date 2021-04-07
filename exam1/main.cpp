@@ -5,6 +5,7 @@ using namespace std::chrono;
 uLCD_4DGL uLCD(D1, D0, D2);
 InterruptIn confirm(D5);
 AnalogIn Ain(A0);
+DigitalIn sw(USER_BUTTON);
 DigitalOut led(LED2);
 AnalogOut Aout(D7);
 InterruptIn upbtn(D3);
@@ -16,7 +17,7 @@ Thread wave;
 
 int mode = 0;
 int a = 1;
-float f=1;
+//float f=1;
 float sr = 1;
 float ADCdata[500];
 
@@ -98,39 +99,49 @@ void updisplay()
             uLCD.printf("error\n");
     }
 }
-/*void sampling()
+
+/*
+void sampling()
 {
+    //float ADCdata[600];                                  
     while(1)
     {
-        for(int i = 0; i < 500; i++)
+        while(1)
         {
-            ADCdata[i] = Ain;
-            wait_us(2000);
-        }
-        for(int i =0; i < 500; i++)
-        {
-            printf("%f\r\n", ADCdata[i]);
-            ThisThread::sleep_for(100ms);
+            if(sw==1) break;
+            for(int i = 0; i < 600; i++)
+            {
+                ADCdata[i] = Ain;
+                wait_us(1700);
+
+            }
+            //printf("%f\r\n", f);                         
+            for(int i =0; i < 600; i++)
+            {
+                printf("%f\r\n", ADCdata[i]);
+                wait_us(50000);
+            }
         }
     }
 }
+
 */
 void waveform()
 {
     while(1)
     {
         led = !led;
-        for(float i = 0.0f; i < 1; i=i+0.0001*sr)
+        for(float i = 0.0f; i < 1; i=i+0.001*sr)
         {
             Aout = i;
-            wait_us(10);
+            wait_us(100);
         }
         for(float i = 0.0f; i < 10-a; i++)
         {        
             Aout = 1;
             ThisThread::sleep_for(100ms);
         }  
-       for(float i = 1; i > 0.0f; i=i-0.0001*sr)
+       for(float i = 1; i > 0.0f; i=i-0.001*sr)
         {
             Aout = i;
             wait_us(10);
@@ -186,7 +197,7 @@ int main()
     uLCD.printf("  1\n");
     led = 1;
     wave.start(waveform);
-    ThisThread::sleep_for(1020ms);
+    //ThisThread::sleep_for(1020ms);
     //sample.start(sampling);
 
 }
