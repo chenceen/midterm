@@ -139,7 +139,7 @@ void waveform()
         for(float i = 0.0f; i < 1-0.2*sr; i=i+0.01)
         {        
             Aout = 1;
-            ThisThread::sleep_for(10ms);
+            ThisThread::sleep_for(1ms);
         }  
        for(float i = 1; i > 0.0f; i=i-0.001*a)
         {
